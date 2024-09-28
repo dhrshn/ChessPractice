@@ -113,7 +113,11 @@ class GameState():
                     break # we cant go out of the board
                               
     def getBishopMoves(self, r, c, moves):
-        pass                    
+        #directions diaoganaly up-right, diaoganaly up-left, diaoganaly down-right, diaoganaly down-left 
+        directions = ((-1,1), (-1,-1), ())
+        
+        
+        
     def getKnightMoves(self, r, c, moves):
         pass                    
     def getKingMoves(self, r, c, moves):
