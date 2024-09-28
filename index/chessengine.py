@@ -94,7 +94,10 @@ class GameState():
     '''                
     def getRookMoves(self, r, c, moves):
         #directions up down left right
-        directions = ((-1, 0), (1, 0), (0, -1), (0, 1))
+        directions = ((-1, 0),
+                      (1, 0),
+                      (0, -1),
+                      (0, 1))
         enemyColor = 'b' if self.whiteToMove else 'w'
         for d in directions:
             for i in range(1,8):
@@ -117,7 +120,10 @@ class GameState():
     '''                              
     def getBishopMoves(self, r, c, moves):
         #directions diaoganaly up-right, diaoganaly up-left, diaoganaly down-right, diaoganaly down-left 
-        directions = ((-1,1), (-1,-1), (1,1), (1,-1))
+        directions = ((-1,1),
+                      (-1,-1),
+                      (1,1),
+                      (1,-1))
         enemyColor = 'b' if self.whiteToMove else 'w'
         for d in directions:
             for i in range(1,8):
@@ -190,7 +196,14 @@ class GameState():
         #queens moves are just the same moves as bishop and rook combined
         # self.getBishopMoves(r, c, moves)
         # self.getRookMoves(r, c, moves)       
-        directions =((-1,1), (-1,-1), (1,1), (1,-1), (-1, 0), (1, 0), (0, -1), (0, 1))
+        directions =((-1,1),
+                     (-1,-1),
+                     (1,1),
+                     (1,-1),
+                     (-1, 0),
+                     (1, 0),
+                     (0, -1),
+                     (0, 1))
         enemyColor = 'b' if self.whiteToMove else 'w'
         for d in directions:
             for i in range(1,8):
@@ -211,12 +224,24 @@ class GameState():
                     
 class Move():
     
-    ranksToRows = {'1':7, '2':6, '3':5, '4':4,
-                   '5':3, '6':2, '7':1, '8':0,}
+    ranksToRows = {'1':7,
+                   '2':6,
+                   '3':5,
+                   '4':4,
+                   '5':3,
+                   '6':2,
+                   '7':1,
+                   '8':0,}
     rowsToRanks = {v: k for k,v in ranksToRows.items()}
     
-    filesToCols = {'a':0, 'b':1, 'c':2, 'd':3, 
-                   'e':4, 'f':5, 'g':6, 'h':7}
+    filesToCols = {'a':0,
+                   'b':1,
+                   'c':2,
+                   'd':3, 
+                   'e':4,
+                   'f':5,
+                   'g':6,
+                   'h':7}
     colsToFiles = {v: k for k,v in filesToCols.items()}
     # maps keys to values
     # key : values
