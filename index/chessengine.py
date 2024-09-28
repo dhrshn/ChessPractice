@@ -25,7 +25,7 @@ class GameState():
             'R':self.getRookMoves,
             'Q':self.getQueenMoves,
             'K':self.getKingMoves
-        }
+        } 
     
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = '--'
@@ -58,37 +58,67 @@ class GameState():
             for c in range(len(self.board[r])):
                 turn = self.board[r][c][0]
                 if (turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
-                    piece = self.board[r][c][1]
-                    # if piece == 'p':
-                    #     self.getPawnMoves(r, c, moves)
-                    # elif piece == 'R':
-                    #     self.getRookMoves(r, c, moves)
-                    # elif piece == 'B':
-                    #     self.getBishopMoves(r, c, moves)
-                    # elif piece == 'N':
-                    #     self.getKnightMoves(r, c, moves)
-                    # elif piece == 'K':
-                    #     self.getKingMoves(r, c, moves)
-                    # elif piece == 'Q':
-                    #     self.getQueenMoves(r, c, moves)
-                    self.moveFunctions[piece](r, c, moves)
+                    piece = self.board[r][c][1]     
+                    self.moveFunctions[piece](r, c, moves)             
         return moves
-                    
+    
+    '''
+    All posible moves of Pawn.
+    '''                
     def getPawnMoves(self, r, c, moves):
         if self.whiteToMove: #white pawn moves
             if self.board[r-1][c] == '--': # One square advance
                 moves.append(Move((r, c), (r-1,c), self.board))
                 if r == 6 and self.board[r-2][c] == '--':# Two square advance
                     moves.append(Move((r, c), (r-2, c), self.board))
-    def getRookMoves():
+            if c-1 >= 0: # capture left
+                if self.board[r-1][c-1][0] == 'b': #enemy piece
+                    moves.append(Move((r,c), (r-1,c-1), self.board))
+            if c+1 <= 7: # capture right
+                if self.board[r-1][c+1][0] == 'b': #enemy piece
+                    moves.append(Move((r,c), (r-1,c+1), self.board))
+        else: # black pawn moves
+            if self.board[r+1][c] == '--': #one square advance
+                moves.append(Move((r,c), (r+1,c), self.board))
+                if r == 1 and self.board[r+2][c] == '--': #two square advance
+                    moves.append(Move((r,c), (r+2,c), self.board))
+            if c+1 <=7: # capture left
+                if self.board[r+1][c+1][0] == 'w': #enemy capture
+                    moves.append(Move((r,c), (r+1,c+1), self.board))
+            if c-1 >=0: #capture right:
+                if self.board[r+1][c-1][0] == 'w': #enemy capture
+                    moves.append(Move((r,c), (r+1,c-1), self.board))
+    
+    '''
+    All posible moves of Rook.
+    '''                
+    def getRookMoves(self, r, c, moves):
+        #directions up down left right
+        directions = ((-1, 0), (1, 0), (0, -1), (0, 1))
+        enemyColor = 'b' if self.whiteToMove else 'w'
+        for d in directions:
+            for i in range(1,8):
+                endRow = r + d[0] * i
+                endCol = c + d[1] * i
+                if 0 <= endRow < 8 and 0 <= endCol < 8: # end boundary of board
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece == '--': # move to an empty space
+                        moves.append(Move((r,c), (endRow,endCol), self.board))
+                    elif endPiece[0] == enemyColor: # capture enemy piece
+                        moves.append(Move((r,c), (endRow,endCol), self.board))
+                        break
+                    else:
+                        break # frendlly piece in the way so we cant check that direction
+                else:
+                    break # we cant go out of the board
+                              
+    def getBishopMoves(self, r, c, moves):
         pass                    
-    def getBishopMoves():
+    def getKnightMoves(self, r, c, moves):
         pass                    
-    def getKnightMoves():
+    def getKingMoves(self, r, c, moves):
         pass                    
-    def getKingMoves():
-        pass                    
-    def getQueenMoves():
+    def getQueenMoves(self, r, c, moves):
         pass                    
                     
 class Move():
@@ -111,7 +141,7 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
-        print(self.moveID)
+        # print(self.moveID)
         
     # overriding the equal method
     def  __eq__(self, other):
