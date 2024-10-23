@@ -34,7 +34,6 @@ def main():
     running = True
     sqSelected = ()# No of squares selected, keep track of the last click of the user (tuple: (row,col))
     playerClicks = []# keep track of players clicks [two tuples: (6,4), (4,4)]
-    
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -55,8 +54,11 @@ def main():
                     if move in validMoves:
                         gs.makeMove(move) 
                         moveMade = True
-                    sqSelected = () # reset the user clicks
-                    playerClicks = []
+                        sqSelected = () # reset the user clicks
+                        playerClicks = []
+                    else:
+                        playerClicks = [sqSelected]
+            # key handlers
             elif e.type == p.KEYDOWN:#Undo Key
                 if e.key == p.K_z:
                     gs.undoMove()

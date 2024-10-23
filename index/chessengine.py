@@ -194,32 +194,32 @@ class GameState():
     '''
     def getQueenMoves(self, r, c, moves):
         #queens moves are just the same moves as bishop and rook combined
-        # self.getBishopMoves(r, c, moves)
-        # self.getRookMoves(r, c, moves)       
-        directions =((-1,1),
-                     (-1,-1),
-                     (1,1),
-                     (1,-1),
-                     (-1, 0),
-                     (1, 0),
-                     (0, -1),
-                     (0, 1))
-        enemyColor = 'b' if self.whiteToMove else 'w'
-        for d in directions:
-            for i in range(1,8):
-                endRow = r + d[0] * i
-                endCol = c + d[1] * i
-                if 0 <= endRow < 8 and 0 <= endCol < 8: # end boundary of board
-                    endPiece = self.board[endRow][endCol]
-                    if endPiece == '--': # move to an empty space
-                        moves.append(Move((r,c), (endRow,endCol), self.board))
-                    elif endPiece[0] == enemyColor: # capture enemy piece
-                        moves.append(Move((r,c), (endRow,endCol), self.board))
-                        break
-                    else:
-                        break # frendlly piece in the way so we cant check that direction
-                else:
-                    break # we cant go out of the board
+        self.getBishopMoves(r, c, moves)
+        self.getRookMoves(r, c, moves)       
+        # directions =((-1,1),
+        #              (-1,-1),
+        #              (1,1),
+        #              (1,-1),
+        #              (-1, 0),
+        #              (1, 0),
+        #              (0, -1),
+        #              (0, 1))
+        # enemyColor = 'b' if self.whiteToMove else 'w'
+        # for d in directions:
+        #     for i in range(1,8):
+        #         endRow = r + d[0] * i
+        #         endCol = c + d[1] * i
+        #         if 0 <= endRow < 8 and 0 <= endCol < 8: # end boundary of board
+        #             endPiece = self.board[endRow][endCol]
+        #             if endPiece == '--': # move to an empty space
+        #                 moves.append(Move((r,c), (endRow,endCol), self.board))
+        #             elif endPiece[0] == enemyColor: # capture enemy piece
+        #                 moves.append(Move((r,c), (endRow,endCol), self.board))
+        #                 break
+        #             else:
+        #                 break # frendlly piece in the way so we cant check that direction
+        #         else:
+        #             break # we cant go out of the board
         
                     
 class Move():
