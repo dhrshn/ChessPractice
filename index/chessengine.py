@@ -18,6 +18,14 @@ class GameState():
         ]
         self.whiteToMove = True
         self.moveLog = []
+
+        self.whiteKingLocation = (7,4)
+        self.blackKingLocation = (0,4)
+        self.inCheck = False
+        self.pins = []
+        self.checks = []
+
+
         self.moveFunctions = {
             'p':self.getPawnMoves,
             'N':self.getKnightMoves,
@@ -25,16 +33,12 @@ class GameState():
             'R':self.getRookMoves,
             'Q':self.getQueenMoves,
             'K':self.getKingMoves
-        } 
-        self.whiteKingLocation = (7,4)
-        self.blackKingLocation = (0,4)
-        self.checkMate = False
-        self.staleMate = False
+        }   
 
 
     def makeMove(self, move):
-        self.board[move.startRow][move.startCol] = '--'
         self.board[move.endRow][move.endCol] = move.pieceMoved
+        self.board[move.startRow][move.startCol] = '--'
         self.moveLog.append(move)# log the move so we can undo it later
         self.whiteToMove = not self.whiteToMove #swamp player
         #update the kings location if moved
@@ -63,28 +67,44 @@ class GameState():
             '''
             
     def getValidMoves(self):
-        #1. Generate all possible moves
-        moves = self.getAllPossibleMoves()
-        #2. for each move , make the move
-        for i in range(len(moves)-1, -1, -1):#when removing from a list go backwards through that list
-            self.makeMove(moves[i])
-            #3. generate all opponents move
-            #4. for each of your opponents moves, see if they attack your king
-            self.whiteToMove = not self.whiteToMove
-            if self.inCheck():
-                moves.remove(moves[i])
-            self.whiteToMove = not self.whiteToMove
-            self.undoMove()
-        if len(moves) == 0:
-            if self.inCheck():
-                self.checkMate = True
-            else:
-                self.staleMate = True
-        else:
-            self.checkMate = False
-            self.staleMate = False
-        #5. if they do attack your king, not a valid move
+        
         return moves
+    
+
+
+    def checkForPinsAndChecks(self):
+        pins = [] #squares where the allied pinned piece is and direction pinned from
+        checks = [] #squares where enemy is applying a check
+        inCheck = False
+        if self.whiteToMove:
+            enemyColor = 'b'
+            allyColor = 'w'
+            startRow = self.whiteKingLocation[0]
+            startCol = self.whiteKingLocation[1]
+        else:
+            enemyColor = 'w'
+            allyColor = 'b'
+            startRow = self.blackKingLocation[0]
+            startCol = self.blackKingLocation[1]
+        #check outward from king for pins and checks, keep track of pins
+        #directions are up,down,left,right, up-right, up-left, down-right, down-left
+        directions = ((-1,0),(1,0),(0,-1),(0,1),(-1,1),(-1,-1),(1,1),(1,-1))
+        for j in range(1,8):
+            d = directions[j]
+            possiblePin = () #reset possible pins
+            for i in range(1,8):
+                endRow = startRow + d[0] * i
+                endCol = startCol + d[1] * i
+                if 0 <= endRow < 8 and 0 <= endCol < 8:
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece[0] == allyColor:
+                        if possiblePin == (): #1st allied piece could be pinned
+                            possiblePin = (endRow, endCol, d[0], d[1])
+                        else: #2nd allied piece, so no pin or check in this directon
+                            break
+                    elif endPiece[0] == enemyColor:
+                        type = endPiece[1]
+
     """
     Determine if the current player is in check
     """            
