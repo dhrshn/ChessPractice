@@ -365,27 +365,20 @@ class GameState():
     '''
     All posible Kings moves
     '''                            
-    def getKingMoves(self, r, c, moves):
+    def getKingMoves(self, r: int, c: int, moves: list) -> None:
+        """Get all possible king moves for a given square."""
         rowMoves = (-1, -1, -1, 0, 0, 1, 1, 1)
         colMoves = (-1, 0, 1, -1, 1, -1, 0, 1)
-        allyColor = 'w' if self.whiteToMove else 'b'
-        for i  in range(8):
-            endRow = r + rowMoves[i]
-            endCol = c + colMoves[i]
-            if 0 <= endRow < 8 and 0 <= endCol < 8:
-                endPiece = self.board[endRow][endCol]                            
-                if endPiece[0] != allyColor:
-                    if allyColor == 'w':
-                        self.whiteKingLocation = (endRow, endCol)
-                    else:
-                        self.blackKingLocation = (endRow, endCol)
-                    inCheck, pins, checks = self.checkForPinsAndChecks()
-                    if not inCheck:
-                        moves.append(Move((r, c), (endRow, endCol), self.board))
-                    if allyColor == 'w':
-                        self.whiteKingLocation = (r, c)
-                    else:
-                        self.blackKingLocation = (r, c)
+        ally_color = 'w' if self.whiteToMove else 'b'
+        for i in range(8):
+            end_row = r + rowMoves[i]
+            end_col = c + colMoves[i]
+            if 0 <= end_row < 8 and 0 <= end_col < 8:
+                end_piece = self.board[end_row][end_col]
+                if end_piece[0] != ally_color:
+                    # Set king location immediately
+                    self.white_king_location = (end_row, end_col) if ally_color == 'w' else (r, c)
+                    moves.append(Move((r, c), (end_row, end_col), self.board))
 
     '''
     All posible Queen moves
