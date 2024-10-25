@@ -37,8 +37,8 @@ class GameState():
 
 
     def makeMove(self, move):
-        self.board[move.endRow][move.endCol] = move.pieceMoved
         self.board[move.startRow][move.startCol] = '--'
+        self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)# log the move so we can undo it later
         self.whiteToMove = not self.whiteToMove #swamp player
         #update the kings location if moved
@@ -46,6 +46,10 @@ class GameState():
             self.whiteKingLocation = (move.endRow, move.endCol)
         elif move.pieceMoved == "bK":
             self.blackKingLocation = (move.endRow, move.endCol)
+
+        #pawn promotion
+        if move.isPawnPromotion:
+            self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
 
         '''
         makeMove takes a move as a perameter and executes it (this will not work for castling, pawn promotion, and en-passant)
@@ -75,6 +79,7 @@ class GameState():
         else:
             kingRow = self.blackKingLocation[0]
             kingCol = self.blackKingLocation[1]
+
         if self.inCheck:
             if len(self.checks) == 1: #only check, block check or move king
                 #to block a check you must move a piece into one of the squares between the enemy piece and king
@@ -101,6 +106,7 @@ class GameState():
                 self.getKingMoves(kingRow, kingCol, moves)
         else: #not in check soo all moves are fine
             moves = self.getAllPossibleMoves()
+        
         return moves
     
 
@@ -122,7 +128,7 @@ class GameState():
         #check outward from king for pins and checks, keep track of pins
         #directions are left up right down / up-left up-right down-left down-right
         directions = ((-1,0), (0,-1), (1,0), (0,1), (-1,-1), (-1,1), (1,-1), (1,1))
-        for j in range(1,8):
+        for j in range(8):
             d = directions[j]
             possiblePin = () #reset possible pins
             for i in range(1,8):
@@ -136,17 +142,17 @@ class GameState():
                         else: #2nd allied piece, so no pin or check in this directon
                             break
                     elif endPiece[0] == enemyColor:
-                        type = endPiece[1]
+                        pieceType = endPiece[1]
                         # 5 possibility here in this complex conditional 
                         #1. orthogonally away from king and piece is a rook
                         #2. diagonally away from king and piece is a bishop
                         #3. 1 square away diagonally from king and piece is a pawn
                         #4. any direction and piece is a queen
                         #5. any direction 1 square away and piece is king (this is necessary to prevent a king move to a square controlled by another king)
-                        if (0 <= j <= 3 and type =="R") or \
-                                (4 <= j <= 7 and type == "B") or\
-                                (i == 1 and type == "p" and ((enemyColor == "w" and 6 <= j <= 7) or (enemyColor == "b" and 4 <= j <= 5))) or\
-                                (type == "Q") or (i == 1 and type == "K"):
+                        if (0 <= j <= 3 and pieceType =="R") or \
+                                (4 <= j <= 7 and pieceType == "B") or\
+                                (i == 1 and pieceType == "p" and ((enemyColor == "w" and 6 <= j <= 7) or (enemyColor == "b" and 4 <= j <= 5))) or\
+                                (pieceType == "Q") or (i == 1 and pieceType == "K"):
                             if possiblePin == (): #no piece blocking, so check
                                 inCheck = True
                                 checks.append((endRow, endCol, d[0], d[1]))
@@ -168,6 +174,7 @@ class GameState():
                 if endPiece[0] == enemyColor and endPiece[1] == "N": #eneemy knight attacking knig
                     inCheck = True
                     checks.append((endRow, endCol, m[0], m[1]))
+
         return inCheck, pins, checks
 
 
@@ -229,18 +236,19 @@ class GameState():
                         moves.append(Move((r, c), (r-2, c), self.board))
             if c-1 >= 0: # capture left
                 if self.board[r-1][c-1][0] == 'b': #enemy piece
-                    if not  piecePinned or pinDirection == (-1,-1):
+                    if not  piecePinned or pinDirection == (1,-1):
                         moves.append(Move((r,c), (r-1,c-1), self.board))
             if c+1 <= 7: # capture right
                 if self.board[r-1][c+1][0] == 'b': #enemy piece
-                    if not  piecePinned or pinDirection == (-1,1):
+                    if not  piecePinned or pinDirection == (-1,-1):
                         moves.append(Move((r,c), (r-1,c+1), self.board))
+
         else: # black pawn moves
             if self.board[r+1][c] == '--': #one square advance
                 if not  piecePinned or pinDirection == (-1,0):
                     moves.append(Move((r,c), (r+1,c), self.board))
-                if r == 1 and self.board[r+2][c] == '--': #two square advance
-                    moves.append(Move((r,c), (r+2,c), self.board))
+                    if r == 1 and self.board[r+2][c] == '--': #two square advance
+                        moves.append(Move((r,c), (r+2,c), self.board))
             if c+1 <=7: # capture left
                 if self.board[r+1][c+1][0] == 'w': #enemy capture
                     if not  piecePinned or pinDirection == (1,-1):
@@ -443,6 +451,9 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.isPawnPromotion = False
+        if (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7):
+            self.isPawnPromotion = True
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         # print(self.moveID)
         
